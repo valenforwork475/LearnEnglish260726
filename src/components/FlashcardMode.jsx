@@ -23,7 +23,7 @@ export default function FlashcardMode({
   const [isFlipped, setIsFlipped] = useState(false);
   const [completedBatch, setCompletedBatch] = useState(false);
 
-  // Helper: Check if a word was reviewed and is not due today
+  // Helper: Check if a word was reviewed and NOT due today (already memorized for now)
   const isWordDoneToday = (wordId) => {
     const wp = srsState?.wordProgress?.[wordId];
     return wp && wp.reviewsCount > 0 && !isWordDue(wp);
@@ -33,6 +33,12 @@ export default function FlashcardMode({
   const isBatchDoneToday = (batchWords) => {
     if (!batchWords || batchWords.length === 0) return false;
     return batchWords.every(w => isWordDoneToday(w.id));
+  };
+
+  // Helper: Build pending queue from a batch (skip already-memorized words)
+  const buildPendingQueue = (batchWords) => {
+    const pending = batchWords.filter(w => !isWordDoneToday(w.id));
+    return pending;
   };
 
   useEffect(() => {
@@ -48,13 +54,14 @@ export default function FlashcardMode({
       initialBatch = 0;
     }
 
-    // Auto-advance to the first uncompleted batch if current batch is 100% finished
+    // Auto-advance to the first batch that still has pending words
     if (filtered.length > 0) {
       const currentBatchWords = filtered.slice(initialBatch * BATCH_SIZE, (initialBatch + 1) * BATCH_SIZE);
-      if (isBatchDoneToday(currentBatchWords)) {
+      const pendingInCurrent = currentBatchWords.filter(w => !isWordDoneToday(w.id));
+      if (pendingInCurrent.length === 0) {
         const firstUndoneIdx = Array.from({ length: totalCount }).findIndex((_, idx) => {
           const bWords = filtered.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
-          return !isBatchDoneToday(bWords);
+          return bWords.some(w => !isWordDoneToday(w.id));
         });
         if (firstUndoneIdx !== -1) {
           initialBatch = firstUndoneIdx;
@@ -64,10 +71,12 @@ export default function FlashcardMode({
 
     setBatchIndex(initialBatch);
     const initialBatchWords = filtered.slice(initialBatch * BATCH_SIZE, (initialBatch + 1) * BATCH_SIZE);
-    setQueue(initialBatchWords);
+    // *** KEY FIX: only queue words not yet reviewed / still due ***
+    const pendingWords = initialBatchWords.filter(w => !isWordDoneToday(w.id));
+    setQueue(pendingWords);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setCompletedBatch(initialBatchWords.length === 0);
+    setCompletedBatch(pendingWords.length === 0);
   }, [selectedLevel, words]);
 
   const totalBatches = Math.ceil(allFilteredWords.length / BATCH_SIZE) || 1;
@@ -76,11 +85,13 @@ export default function FlashcardMode({
   const handleSelectBatch = (idx) => {
     setBatchIndex(idx);
     localStorage.setItem(`neuroflash_last_batch_${selectedLevel}`, idx);
-    const selectedBatchWords = allFilteredWords.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
-    setQueue(selectedBatchWords);
+    const allBatchWords = allFilteredWords.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
+    // *** KEY FIX: only queue words not yet reviewed / still due ***
+    const pendingWords = allBatchWords.filter(w => !isWordDoneToday(w.id));
+    setQueue(pendingWords);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setCompletedBatch(selectedBatchWords.length === 0);
+    setCompletedBatch(pendingWords.length === 0);
   };
 
   const handleFlip = () => {
