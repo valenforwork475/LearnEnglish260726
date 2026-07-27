@@ -97,7 +97,7 @@ export default function QuizMode({ words, accent, selectedLevel, onSelectLevel, 
           </div>
         </div>
 
-        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} />
+        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} words={words} />
       </div>
 
       {/* Question Card */}

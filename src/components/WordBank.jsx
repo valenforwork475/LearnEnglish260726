@@ -45,7 +45,7 @@ export default function WordBank({ words, srsState, accent, selectedLevel, onSel
           />
         </div>
 
-        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} />
+        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} words={words} />
       </div>
 
       {/* Word Cards List */}

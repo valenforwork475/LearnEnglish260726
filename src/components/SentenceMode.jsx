@@ -99,7 +99,7 @@ export default function SentenceMode({ words, accent, selectedLevel, onSelectLev
           </span>
         </div>
 
-        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} />
+        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} words={words} />
       </div>
 
       {/* Target Translation Box */}

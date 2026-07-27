@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Volume2, RotateCcw, HelpCircle, ArrowLeft, RefreshCw, CheckCircle2, Play, Award } from "lucide-react";
+import { Volume2, RotateCcw, HelpCircle, ArrowLeft, RefreshCw, CheckCircle2, Play, Award, Layers } from "lucide-react";
 import confetti from "canvas-confetti";
 import LevelSelector from "./LevelSelector";
 import { speakText, sfx } from "../utils/audio";
@@ -37,6 +37,15 @@ export default function FlashcardMode({
 
   const totalBatches = Math.ceil(allFilteredWords.length / BATCH_SIZE) || 1;
   const currentWord = queue[currentIndex];
+
+  const handleSelectBatch = (idx) => {
+    setBatchIndex(idx);
+    const selectedBatchWords = allFilteredWords.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
+    setQueue(selectedBatchWords);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setCompletedBatch(selectedBatchWords.length === 0);
+  };
 
   const handleFlip = () => {
     sfx.playFlip();
@@ -84,21 +93,12 @@ export default function FlashcardMode({
   const handleNextBatch = () => {
     const nextBatchIdx = batchIndex + 1;
     if (nextBatchIdx < totalBatches) {
-      const nextBatchWords = allFilteredWords.slice(nextBatchIdx * BATCH_SIZE, (nextBatchIdx + 1) * BATCH_SIZE);
-      setBatchIndex(nextBatchIdx);
-      setQueue(nextBatchWords);
-      setCurrentIndex(0);
-      setIsFlipped(false);
-      setCompletedBatch(false);
+      handleSelectBatch(nextBatchIdx);
     }
   };
 
   const handleRestartBatch = () => {
-    const currentBatchWords = allFilteredWords.slice(batchIndex * BATCH_SIZE, (batchIndex + 1) * BATCH_SIZE);
-    setQueue(currentBatchWords);
-    setCurrentIndex(0);
-    setIsFlipped(false);
-    setCompletedBatch(false);
+    handleSelectBatch(batchIndex);
   };
 
   // Completed 10-Word Batch Screen
@@ -114,7 +114,7 @@ export default function FlashcardMode({
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 mb-2">
             ชุดที่ {batchIndex + 1} / {totalBatches} (10 คำ)
           </span>
-          <h2 className="text-xl font-bold text-stone-900">จบรอบทบทวน 10 คำนี้แล้ว</h2>
+          <h2 className="text-xl font-bold text-stone-900">จบรอบทบทวน 10 คำนี้แล้ว!</h2>
           <p className="text-xs text-stone-600 mt-2 max-w-xs mx-auto leading-relaxed">
             สมองจดจำคำศัพท์ชุดนี้ได้แม่นยำขึ้นแล้ว เลือกเริ่มชุดถัดไปหรือทบทวนชุดนี้ซ้ำได้ครับ
           </p>
@@ -161,7 +161,7 @@ export default function FlashcardMode({
 
   return (
     <div className="space-y-4 pb-24">
-      {/* Navigation Header */}
+      {/* Navigation Header & Level Selector */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <button
@@ -182,7 +182,35 @@ export default function FlashcardMode({
           </div>
         </div>
 
-        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} />
+        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} words={words} />
+
+        {/* 10-Word Batch Bar Selector */}
+        {totalBatches > 1 && (
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
+            <span className="text-[10px] font-bold text-stone-400 whitespace-nowrap flex items-center gap-1">
+              <Layers className="w-3 h-3" />
+              ชุด 10 คำ:
+            </span>
+            {Array.from({ length: totalBatches }).map((_, idx) => {
+              const isSelected = batchIndex === idx;
+              const startNum = idx * BATCH_SIZE + 1;
+              const endNum = Math.min((idx + 1) * BATCH_SIZE, allFilteredWords.length);
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectBatch(idx)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all border ${
+                    isSelected
+                      ? "bg-amber-600 border-amber-700 text-white shadow-xs"
+                      : "bg-white border-stone-200 text-stone-600 hover:bg-amber-50 hover:border-amber-300"
+                  }`}
+                >
+                  ชุดที่ {idx + 1} ({startNum}-{endNum})
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 3D Flashcard */}
@@ -195,7 +223,7 @@ export default function FlashcardMode({
             isFlipped ? "rotate-y-180" : ""
           }`}
         >
-          {/* FRONT SIDE */}
+          {/* FRONT SIDE - Word Only (No phonetic/pronunciation) */}
           <div className="absolute inset-0 w-full h-full rounded-3xl bg-white border border-[#e7e2d9] p-6 flex flex-col justify-between backface-hidden shadow-sm">
             <div className="flex items-center justify-between">
               <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
@@ -214,29 +242,20 @@ export default function FlashcardMode({
               <h2 className="text-4xl font-extrabold text-stone-900 tracking-tight">
                 {currentWord.word}
               </h2>
-
-              <p className="text-xs font-mono text-stone-500">
-                {currentWord.ipa}
-              </p>
-
-              {/* Thai Phonetic Reading Badge */}
-              <div className="inline-block px-3.5 py-1.5 rounded-xl bg-amber-100/80 border border-amber-300 text-amber-950 font-medium text-sm">
-                คำอ่าน: <span className="font-bold text-amber-900">{currentWord.phoneticThai}</span>
-              </div>
             </div>
 
             <div className="text-center">
               <span className="text-[11px] text-stone-400 flex items-center justify-center space-x-1">
                 <HelpCircle className="w-3.5 h-3.5 text-stone-400" />
-                <span>แตะการ์ดเพื่อดูคำแปล & ประโยคตัวอย่าง</span>
+                <span>แตะการ์ดเพื่อดูคำอ่าน คำแปล & ประโยคตัวอย่าง</span>
               </span>
             </div>
           </div>
 
-          {/* BACK SIDE */}
+          {/* BACK SIDE - Meaning + Phonetic / คำอ่าน + Example Sentence */}
           <div className="absolute inset-0 w-full h-full rounded-3xl bg-[#f5f2eb] border border-[#e7e2d9] p-6 flex flex-col justify-between rotate-y-180 backface-hidden shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-800">คำแปล & ประโยคตัวอย่าง</span>
+              <span className="text-xs font-bold text-amber-800">คำอ่าน คำแปล & ประโยคตัวอย่าง</span>
               <button
                 onClick={(e) => handleSpeech(e, currentWord.exampleEn)}
                 className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-700 border border-amber-500/20 hover:bg-amber-600 hover:text-white flex items-center justify-center transition"
@@ -249,6 +268,16 @@ export default function FlashcardMode({
             <div className="text-center my-auto space-y-3">
               <div className="text-2xl font-bold text-amber-900">
                 {currentWord.meaning}
+              </div>
+
+              {/* Phonetic Reading & IPA moved to BACK SIDE */}
+              <div className="flex flex-col items-center justify-center gap-1">
+                <div className="inline-block px-3 py-1 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-950 font-medium text-xs">
+                  คำอ่าน: <span className="font-bold text-amber-900">{currentWord.phoneticThai}</span>
+                </div>
+                <p className="text-[11px] font-mono text-stone-500">
+                  {currentWord.ipa}
+                </p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-white border border-[#e7e2d9] text-left space-y-1.5 shadow-sm">
@@ -313,3 +342,4 @@ export default function FlashcardMode({
     </div>
   );
 }
+

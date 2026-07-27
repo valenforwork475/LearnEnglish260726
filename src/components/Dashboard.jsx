@@ -3,7 +3,7 @@ import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen } from "lucide
 import { LEVELS_CONFIG } from "../data/vocabulary";
 import LevelSelector from "./LevelSelector";
 
-export default function Dashboard({ metrics, onStartSRS, onNavigate, selectedLevel, onSelectLevel }) {
+export default function Dashboard({ metrics, words, onStartSRS, onNavigate, selectedLevel, onSelectLevel }) {
   const stageIntervals = [
     { stage: 0, label: "ใหม่", color: "bg-stone-300" },
     { stage: 1, label: "1 วัน", color: "bg-rose-400" },
@@ -24,7 +24,7 @@ export default function Dashboard({ metrics, onStartSRS, onNavigate, selectedLev
           <span className="text-xs font-bold text-stone-600">เลเวลที่กำลังเรียน:</span>
           <span className="text-xs font-bold text-amber-800">{levelTitle}</span>
         </div>
-        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} />
+        <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} words={words} />
       </div>
 
       {/* Hero SRS Review Banner - Filtered strictly by selectedLevel */}

@@ -51,6 +51,7 @@ export default function App() {
         {activeTab === "dashboard" && (
           <Dashboard
             metrics={metrics}
+            words={VOCABULARY_DATA}
             onStartSRS={() => setActiveTab("flashcard")}
             onNavigate={(tab) => setActiveTab(tab)}
             selectedLevel={selectedLevel}
