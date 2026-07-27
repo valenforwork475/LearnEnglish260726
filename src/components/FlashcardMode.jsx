@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Volume2, RotateCcw, HelpCircle, ArrowLeft, RefreshCw, CheckCircle2, Play, Award, Layers } from "lucide-react";
+import { Volume2, RotateCcw, HelpCircle, ArrowLeft, RefreshCw, CheckCircle2, Play, Award, Layers, Check } from "lucide-react";
 import confetti from "canvas-confetti";
 import LevelSelector from "./LevelSelector";
 import { speakText, sfx } from "../utils/audio";
-import { SRS_STAGES } from "../utils/srsEngine";
+import { SRS_STAGES, isWordDue } from "../utils/srsEngine";
 
 const BATCH_SIZE = 10; // 10 words per review round
 
@@ -23,16 +23,51 @@ export default function FlashcardMode({
   const [isFlipped, setIsFlipped] = useState(false);
   const [completedBatch, setCompletedBatch] = useState(false);
 
+  // Helper: Check if a word was reviewed and is not due today
+  const isWordDoneToday = (wordId) => {
+    const wp = srsState?.wordProgress?.[wordId];
+    return wp && wp.reviewsCount > 0 && !isWordDue(wp);
+  };
+
+  // Helper: Check if an entire 10-word batch is finished for today
+  const isBatchDoneToday = (batchWords) => {
+    if (!batchWords || batchWords.length === 0) return false;
+    return batchWords.every(w => isWordDoneToday(w.id));
+  };
+
   useEffect(() => {
     const filtered = selectedLevel === "all" ? words : words.filter(w => w.level === selectedLevel);
     setAllFilteredWords(filtered);
-    setBatchIndex(0);
 
-    const firstBatch = filtered.slice(0, BATCH_SIZE);
-    setQueue(firstBatch);
+    const totalCount = Math.ceil(filtered.length / BATCH_SIZE) || 1;
+
+    // Check saved batch from localStorage
+    const savedBatchStr = localStorage.getItem(`neuroflash_last_batch_${selectedLevel}`);
+    let initialBatch = savedBatchStr !== null ? parseInt(savedBatchStr, 10) : 0;
+    if (isNaN(initialBatch) || initialBatch >= totalCount || initialBatch < 0) {
+      initialBatch = 0;
+    }
+
+    // Auto-advance to the first uncompleted batch if current batch is 100% finished
+    if (filtered.length > 0) {
+      const currentBatchWords = filtered.slice(initialBatch * BATCH_SIZE, (initialBatch + 1) * BATCH_SIZE);
+      if (isBatchDoneToday(currentBatchWords)) {
+        const firstUndoneIdx = Array.from({ length: totalCount }).findIndex((_, idx) => {
+          const bWords = filtered.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
+          return !isBatchDoneToday(bWords);
+        });
+        if (firstUndoneIdx !== -1) {
+          initialBatch = firstUndoneIdx;
+        }
+      }
+    }
+
+    setBatchIndex(initialBatch);
+    const initialBatchWords = filtered.slice(initialBatch * BATCH_SIZE, (initialBatch + 1) * BATCH_SIZE);
+    setQueue(initialBatchWords);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setCompletedBatch(firstBatch.length === 0);
+    setCompletedBatch(initialBatchWords.length === 0);
   }, [selectedLevel, words]);
 
   const totalBatches = Math.ceil(allFilteredWords.length / BATCH_SIZE) || 1;
@@ -40,6 +75,7 @@ export default function FlashcardMode({
 
   const handleSelectBatch = (idx) => {
     setBatchIndex(idx);
+    localStorage.setItem(`neuroflash_last_batch_${selectedLevel}`, idx);
     const selectedBatchWords = allFilteredWords.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
     setQueue(selectedBatchWords);
     setCurrentIndex(0);
@@ -114,9 +150,9 @@ export default function FlashcardMode({
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 mb-2">
             ชุดที่ {batchIndex + 1} / {totalBatches} (10 คำ)
           </span>
-          <h2 className="text-xl font-bold text-stone-900">จบรอบทบทวน 10 คำนี้แล้ว!</h2>
+          <h2 className="text-xl font-bold text-stone-900">จบรอบทบทวน 10 คำในชุดนี้แล้ว!</h2>
           <p className="text-xs text-stone-600 mt-2 max-w-xs mx-auto leading-relaxed">
-            สมองจดจำคำศัพท์ชุดนี้ได้แม่นยำขึ้นแล้ว เลือกเริ่มชุดถัดไปหรือทบทวนชุดนี้ซ้ำได้ครับ
+            สมองจดจำคำศัพท์ชุดนี้ได้แม่นยำขึ้นแล้ว เลือกเริ่มทบทวน 10 คำในชุดถัดไปได้เลยครับ
           </p>
         </div>
 
@@ -184,7 +220,7 @@ export default function FlashcardMode({
 
         <LevelSelector selectedLevel={selectedLevel} onSelectLevel={onSelectLevel} words={words} />
 
-        {/* 10-Word Batch Bar Selector */}
+        {/* 10-Word Batch Bar Selector with Completion Badges */}
         {totalBatches > 1 && (
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
             <span className="text-[10px] font-bold text-stone-400 whitespace-nowrap flex items-center gap-1">
@@ -195,17 +231,24 @@ export default function FlashcardMode({
               const isSelected = batchIndex === idx;
               const startNum = idx * BATCH_SIZE + 1;
               const endNum = Math.min((idx + 1) * BATCH_SIZE, allFilteredWords.length);
+
+              const batchWords = allFilteredWords.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
+              const isDone = isBatchDoneToday(batchWords);
+
               return (
                 <button
                   key={idx}
                   onClick={() => handleSelectBatch(idx)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all border ${
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all border flex items-center gap-1 ${
                     isSelected
                       ? "bg-amber-600 border-amber-700 text-white shadow-xs"
+                      : isDone
+                      ? "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100"
                       : "bg-white border-stone-200 text-stone-600 hover:bg-amber-50 hover:border-amber-300"
                   }`}
                 >
-                  ชุดที่ {idx + 1} ({startNum}-{endNum})
+                  {isDone && <Check className="w-3 h-3 text-emerald-600 font-bold" />}
+                  <span>ชุดที่ {idx + 1} ({startNum}-{endNum})</span>
                 </button>
               );
             })}
@@ -342,4 +385,5 @@ export default function FlashcardMode({
     </div>
   );
 }
+
 
