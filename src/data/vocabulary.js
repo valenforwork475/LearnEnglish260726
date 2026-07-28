@@ -124,29 +124,29 @@ export const VOCABULARY_DATA = [
   },
   {
     id: "v-110",
-    word: "Spontaneous",
-    ipa: "/spɒnˈteɪ.ni.əs/",
-    phoneticThai: "สพอน-เท-เนียส",
-    meaning: "เกิดตามธรรมชาติ, เป็นไปโดยไม่ได้วางแผนไว้ล่วงหน้า",
-    partOfSpeech: "adjective",
+    word: "Explain",
+    ipa: "/ɪkˈspleɪn/",
+    phoneticThai: "อิก-สเพลน",
+    meaning: "อธิบาย, ชี้แจง",
+    partOfSpeech: "verb",
     level: "starter",
     category: "daily",
-    exampleEn: "We took a spontaneous trip to the beach.",
-    exampleTh: "พวกเราทริปปุบปับไปเที่ยวทะเลกัน",
-    examplePhonetic: "วี ทุค อะ สพอน-เท-เนียส ทริป ทู เดอะ บีช"
+    exampleEn: "Can you explain how this works?",
+    exampleTh: "คุณช่วยอธิบายว่าสิ่งนี้ทำงานอย่างไรได้ไหม?",
+    examplePhonetic: "แคน ยู อิก-สเพลน เฮา ดิส เวิร์คส์"
   },
   {
     id: "v-111",
-    word: "Delighted",
-    ipa: "/dɪˈlaɪ.tɪd/",
-    phoneticThai: "ดิ-ไล-เทด",
-    meaning: "ยินดีอย่างยิ่ง, ดีใจมาก",
+    word: "Worried",
+    ipa: "/ˈwʌr.id/",
+    phoneticThai: "วัร-ริด",
+    meaning: "กังวล, เป็นห่วง",
     partOfSpeech: "adjective",
     level: "starter",
     category: "daily",
-    exampleEn: "I am delighted to meet you here.",
-    exampleTh: "ฉันยินดีเป็นอย่างยิ่งที่ได้พบคุณที่นี่",
-    examplePhonetic: "ไอ แอม ดิ-ไล-เทด ทู มีท ยู เฮียร์"
+    exampleEn: "I am worried about the exam tomorrow.",
+    exampleTh: "ฉันกังวลเกี่ยวกับการสอบพรุ่งนี้",
+    examplePhonetic: "ไอ แอม วัร-ริด อะ-เบาท์ ดิ อิก-แซม ทู-มอ-โรว์"
   },
   {
     id: "v-112",
@@ -397,16 +397,16 @@ export const VOCABULARY_DATA = [
   },
   {
     id: "v-131",
-    word: "Delicate",
-    ipa: "/ˈdel.ɪ.kət/",
-    phoneticThai: "เดล-ลิ-เคท",
-    meaning: "ประณีต, บอบบาง",
+    word: "Popular",
+    ipa: "/ˈpɒp.jə.lər/",
+    phoneticThai: "พ็อป-พิว-ลาร์",
+    meaning: "เป็นที่นิยม, มีชื่อเสียง",
     partOfSpeech: "adjective",
     level: "starter",
     category: "daily",
-    exampleEn: "Handle this delicate glass vase with care.",
-    exampleTh: "จับแจกันแก้วบอบบางนี้ด้วยความระมัดระวัง",
-    examplePhonetic: "แฮน-เดิล ดิส เดล-ลิ-เคท กลาส เบส วิธ แคร์"
+    exampleEn: "This song is very popular right now.",
+    exampleTh: "เพลงนี้เป็นที่นิยมมากในตอนนี้",
+    examplePhonetic: "ดิส ซอง อิส เวรี พ็อป-พิว-ลาร์ ไรท์ นาว"
   },
   {
     id: "v-132",
@@ -475,16 +475,16 @@ export const VOCABULARY_DATA = [
   },
   {
     id: "v-137",
-    word: "Hilarious",
-    ipa: "/hɪˈleə.ri.əs/",
-    phoneticThai: "ฮิ-แลร์-เรียส",
-    meaning: "ตลกขบขันมากๆ",
-    partOfSpeech: "adjective",
+    word: "Choose",
+    ipa: "/tʃuːz/",
+    phoneticThai: "ชูซ",
+    meaning: "เลือก, คัดเลือก",
+    partOfSpeech: "verb",
     level: "starter",
     category: "daily",
-    exampleEn: "That comedy movie was hilarious.",
-    exampleTh: "หนังตลกเรื่องนั้นตลกขบขันมากๆ",
-    examplePhonetic: "แดท คอม-เม-ดี มู-วี วอส ฮิ-แลร์-เรียส"
+    exampleEn: "You can choose any dish from the menu.",
+    exampleTh: "คุณสามารถเลือกเมนูอะไรก็ได้จากรายการอาหาร",
+    examplePhonetic: "ยู แคน ชูซ เอ-นี ดิช ฟรอม เดอะ เมน-ยู"
   },
   {
     id: "v-138",
@@ -657,16 +657,16 @@ export const VOCABULARY_DATA = [
   },
   {
     id: "v-151",
-    word: "Wisdom",
-    ipa: "/ˈwɪz.dəm/",
-    phoneticThai: "วิซ-ดอม",
-    meaning: "ภูมิปัญญา, ความเฉลียวฉลาด",
-    partOfSpeech: "noun",
+    word: "Healthy",
+    ipa: "/ˈhel.θi/",
+    phoneticThai: "เฮล-ธี",
+    meaning: "มีสุขภาพดี, ดีต่อสุขภาพ",
+    partOfSpeech: "adjective",
     level: "starter",
     category: "daily",
-    exampleEn: "Words of wisdom guide us through challenges.",
-    exampleTh: "คำสอนแห่งภูมิปัญญาช่วยนำทางพวกเราผ่านอุปสรรค",
-    examplePhonetic: "เวิร์ดส์ ออฟ วิซ-ดอม ไกด อัส ธรู แชล-เลนจ์-เสส"
+    exampleEn: "Eating vegetables keeps you healthy.",
+    exampleTh: "การกินผักทำให้คุณมีสุขภาพดี",
+    examplePhonetic: "อีท-ทิง เวจ-จะ-เทิลส์ คีพส์ ยู เฮล-ธี"
   },
   {
     id: "v-152",
@@ -1959,10 +1959,76 @@ export const VOCABULARY_DATA = [
     exampleTh: "คุณจะสังเกตเห็นการเปลี่ยนแปลงพลิกโฉมในความคล่องแคล่วของคุณ",
     examplePhonetic: "ยู วิล โน-ทิส อะ ทรานส์-ฟอร์-เม-ชัน อิน ยัวร์ ฟลู-เอน-ซี"
   },
+  {
+    id: "v-251",
+    word: "Spontaneous",
+    ipa: "/spɒnˈteɪ.ni.əs/",
+    phoneticThai: "สพอน-เท-เนียส",
+    meaning: "เกิดขึ้นเองโดยไม่ได้วางแผน, ตามสัญชาตญาณ",
+    partOfSpeech: "adjective",
+    level: "intermediate",
+    category: "daily",
+    exampleEn: "Her spontaneous decision to travel changed her life.",
+    exampleTh: "การตัดสินใจโดยฉับพลันของเธอที่จะเดินทางเปลี่ยนชีวิตของเธอ",
+    examplePhonetic: "เฮอร์ สพอน-เท-เนียส ดิ-ซิ-ชัน ทู ทแรฟ-เวิล เชนจ์ด เฮอร์ ไลฟ์"
+  },
+  {
+    id: "v-252",
+    word: "Delighted",
+    ipa: "/dɪˈlaɪ.tɪd/",
+    phoneticThai: "ดิ-ไล-เทด",
+    meaning: "ยินดีอย่างยิ่ง, มีความสุขมาก (ใช้ในบริบททางการ)",
+    partOfSpeech: "adjective",
+    level: "intermediate",
+    category: "business",
+    exampleEn: "We are delighted to welcome you to our team.",
+    exampleTh: "เรารู้สึกยินดีเป็นอย่างยิ่งที่ต้อนรับคุณเข้าสู่ทีมของเรา",
+    examplePhonetic: "วี อา ดิ-ไล-เทด ทู เวล-คัม ยู ทู อาวเวอร์ ทีม"
+  },
+  {
+    id: "v-253",
+    word: "Delicate",
+    ipa: "/ˈdel.ɪ.kət/",
+    phoneticThai: "เดล-ลิ-เคท",
+    meaning: "ละเอียดอ่อน, ต้องใช้ความระมัดระวัง, ซับซ้อนพอสมควร",
+    partOfSpeech: "adjective",
+    level: "intermediate",
+    category: "daily",
+    exampleEn: "This is a delicate situation that needs careful handling.",
+    exampleTh: "นี่เป็นสถานการณ์ที่ละเอียดอ่อนซึ่งต้องการการจัดการอย่างระมัดระวัง",
+    examplePhonetic: "ดิส อิส อะ เดล-ลิ-เคท ซิท-ชู-เอ-ชัน แดท นีดส์ แคร์-ฟูล แฮน-ดลิง"
+  },
+  {
+    id: "v-254",
+    word: "Hilarious",
+    ipa: "/hɪˈleə.ri.əs/",
+    phoneticThai: "ฮิ-แลร์-เรียส",
+    meaning: "ตลกขบขันอย่างยิ่ง, น่าขำมาก",
+    partOfSpeech: "adjective",
+    level: "intermediate",
+    category: "daily",
+    exampleEn: "His stand-up comedy show was absolutely hilarious.",
+    exampleTh: "การแสดงสแตนด์อัพโคมิดี้ของเขาตลกขบขันอย่างยิ่งจริงๆ",
+    examplePhonetic: "ฮิส สแตนด์-อัพ คอม-มิ-ดี โชว์ วอส แอ็บ-โซ-ลูท-ลี ฮิ-แลร์-เรียส"
+  },
+  {
+    id: "v-255",
+    word: "Wisdom",
+    ipa: "/ˈwɪz.dəm/",
+    phoneticThai: "วิซ-ดอม",
+    meaning: "ภูมิปัญญา, ความเฉลียวฉลาดที่ได้จากประสบการณ์",
+    partOfSpeech: "noun",
+    level: "intermediate",
+    category: "daily",
+    exampleEn: "With age comes wisdom and better decision-making.",
+    exampleTh: "เมื่อมีอายุมากขึ้นก็จะมีภูมิปัญญาและการตัดสินใจที่ดีขึ้นตามมา",
+    examplePhonetic: "วิธ เอจ คัมส์ วิซ-ดอม แอนด์ เบท-เทอร์ ดิ-ซิ-ชัน-เมค-คิง"
+  },
 
   // ==========================================
   // --- LEVEL 3: ADVANCED (C1-C2) ---
   // ==========================================
+
   {
     id: "v-301",
     word: "Metacognition",
