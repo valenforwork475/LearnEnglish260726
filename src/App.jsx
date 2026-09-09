@@ -4,6 +4,8 @@ import BottomNav from "./components/BottomNav";
 import Dashboard from "./components/Dashboard";
 import FlashcardMode from "./components/FlashcardMode";
 import GrammarMode from "./components/GrammarMode";
+import WordMatchMode from "./components/WordMatchMode";
+import WordScrambleMode from "./components/WordScrambleMode";
 import SentenceMode from "./components/SentenceMode";
 import QuizMode from "./components/QuizMode";
 import WordBank from "./components/WordBank";
@@ -77,6 +79,28 @@ export default function App() {
             accent={accent}
             selectedLevel={selectedLevel}
             onSelectLevel={setSelectedLevel}
+            onBackToDashboard={() => setActiveTab("dashboard")}
+          />
+        )}
+
+        {activeTab === "match" && (
+          <WordMatchMode
+            words={VOCABULARY_DATA}
+            accent={accent}
+            selectedLevel={selectedLevel}
+            onSelectLevel={setSelectedLevel}
+            onRateWord={handleRateWord}
+            onBackToDashboard={() => setActiveTab("dashboard")}
+          />
+        )}
+
+        {activeTab === "scramble" && (
+          <WordScrambleMode
+            words={VOCABULARY_DATA}
+            accent={accent}
+            selectedLevel={selectedLevel}
+            onSelectLevel={setSelectedLevel}
+            onRateWord={handleRateWord}
             onBackToDashboard={() => setActiveTab("dashboard")}
           />
         )}

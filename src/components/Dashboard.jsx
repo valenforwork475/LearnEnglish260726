@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen, BookOpenCheck } from "lucide-react";
+import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen, BookOpenCheck, Gamepad2, Puzzle } from "lucide-react";
 import { LEVELS_CONFIG } from "../data/vocabulary";
 import LevelSelector from "./LevelSelector";
 
@@ -106,6 +106,40 @@ export default function Dashboard({ metrics, words, onStartSRS, onNavigate, sele
       <div>
         <h3 className="text-xs font-bold text-stone-500 mb-3 px-1">เลือกโหมดการฝึกจำ ({levelTitle})</h3>
         <div className="grid grid-cols-2 gap-3">
+          {/* Word Match Game */}
+          <button
+            onClick={() => onNavigate("match")}
+            className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-600/10 border border-emerald-500/30 hover:border-emerald-500 text-left transition flex flex-col justify-between group shadow-sm"
+          >
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm mb-3">
+              <Gamepad2 className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-1">
+                <h4 className="font-bold text-stone-900 text-sm group-hover:text-emerald-800 transition">เกมจับคู่ศัพท์</h4>
+                <span className="px-1.5 py-0.2 text-[9px] font-extrabold bg-emerald-600 text-white rounded">GAME</span>
+              </div>
+              <p className="text-[11px] text-stone-500 mt-0.5">จับคู่คำศัพท์ EN-TH แบบเพลินๆ</p>
+            </div>
+          </button>
+
+          {/* Word Scramble Game */}
+          <button
+            onClick={() => onNavigate("scramble")}
+            className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-indigo-600/10 border border-purple-500/30 hover:border-purple-500 text-left transition flex flex-col justify-between group shadow-sm"
+          >
+            <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-sm mb-3">
+              <Puzzle className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-1">
+                <h4 className="font-bold text-stone-900 text-sm group-hover:text-purple-800 transition">เกมสะกดศัพท์</h4>
+                <span className="px-1.5 py-0.2 text-[9px] font-extrabold bg-purple-600 text-white rounded">FUN</span>
+              </div>
+              <p className="text-[11px] text-stone-500 mt-0.5">เรียงบล็อกตัวอักษรสร้างคำศัพท์</p>
+            </div>
+          </button>
+
           {/* Grammar Quiz */}
           <button
             onClick={() => onNavigate("grammar")}
