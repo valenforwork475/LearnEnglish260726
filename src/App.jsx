@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import Dashboard from "./components/Dashboard";
 import FlashcardMode from "./components/FlashcardMode";
+import GrammarMode from "./components/GrammarMode";
 import SentenceMode from "./components/SentenceMode";
 import QuizMode from "./components/QuizMode";
 import WordBank from "./components/WordBank";
@@ -64,6 +65,15 @@ export default function App() {
             words={VOCABULARY_DATA}
             srsState={srsState}
             onRateWord={handleRateWord}
+            accent={accent}
+            selectedLevel={selectedLevel}
+            onSelectLevel={setSelectedLevel}
+            onBackToDashboard={() => setActiveTab("dashboard")}
+          />
+        )}
+
+        {activeTab === "grammar" && (
+          <GrammarMode
             accent={accent}
             selectedLevel={selectedLevel}
             onSelectLevel={setSelectedLevel}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen } from "lucide-react";
+import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen, BookOpenCheck } from "lucide-react";
 import { LEVELS_CONFIG } from "../data/vocabulary";
 import LevelSelector from "./LevelSelector";
 
@@ -106,6 +106,23 @@ export default function Dashboard({ metrics, words, onStartSRS, onNavigate, sele
       <div>
         <h3 className="text-xs font-bold text-stone-500 mb-3 px-1">เลือกโหมดการฝึกจำ ({levelTitle})</h3>
         <div className="grid grid-cols-2 gap-3">
+          {/* Grammar Quiz */}
+          <button
+            onClick={() => onNavigate("grammar")}
+            className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-600/10 border border-amber-500/30 hover:border-amber-500 text-left transition flex flex-col justify-between group shadow-sm"
+          >
+            <div className="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-sm mb-3">
+              <BookOpenCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-1">
+                <h4 className="font-bold text-stone-900 text-sm group-hover:text-amber-800 transition">ข้อสอบแกรมม่า</h4>
+                <span className="px-1.5 py-0.2 text-[9px] font-extrabold bg-amber-600 text-white rounded">NEW</span>
+              </div>
+              <p className="text-[11px] text-stone-500 mt-0.5">ตะลุยข้อสอบแกรมม่าพร้อมเฉลย</p>
+            </div>
+          </button>
+
           {/* Flashcards */}
           <button
             onClick={() => onNavigate("flashcard")}
