@@ -4,6 +4,7 @@ import BottomNav from "./components/BottomNav";
 import Dashboard from "./components/Dashboard";
 import FlashcardMode from "./components/FlashcardMode";
 import GrammarMode from "./components/GrammarMode";
+import MovieMode from "./components/MovieMode";
 import WordMatchMode from "./components/WordMatchMode";
 import WordScrambleMode from "./components/WordScrambleMode";
 import SentenceMode from "./components/SentenceMode";
@@ -79,6 +80,13 @@ export default function App() {
             accent={accent}
             selectedLevel={selectedLevel}
             onSelectLevel={setSelectedLevel}
+            onBackToDashboard={() => setActiveTab("dashboard")}
+          />
+        )}
+
+        {activeTab === "movie" && (
+          <MovieMode
+            accent={accent}
             onBackToDashboard={() => setActiveTab("dashboard")}
           />
         )}
