@@ -5,6 +5,7 @@ import Dashboard from "./components/Dashboard";
 import FlashcardMode from "./components/FlashcardMode";
 import GrammarMode from "./components/GrammarMode";
 import MovieMode from "./components/MovieMode";
+import BossBattleMode from "./components/BossBattleMode";
 import WordMatchMode from "./components/WordMatchMode";
 import WordScrambleMode from "./components/WordScrambleMode";
 import SentenceMode from "./components/SentenceMode";
@@ -71,6 +72,13 @@ export default function App() {
             accent={accent}
             selectedLevel={selectedLevel}
             onSelectLevel={setSelectedLevel}
+            onBackToDashboard={() => setActiveTab("dashboard")}
+          />
+        )}
+
+        {activeTab === "boss" && (
+          <BossBattleMode
+            accent={accent}
             onBackToDashboard={() => setActiveTab("dashboard")}
           />
         )}

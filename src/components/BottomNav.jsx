@@ -1,10 +1,10 @@
 import React from "react";
-import { LayoutDashboard, Layers, Clapperboard, Gamepad2, BookOpenCheck, BrainCircuit, Library } from "lucide-react";
+import { LayoutDashboard, Layers, Swords, Clapperboard, Gamepad2, BookOpenCheck, Library } from "lucide-react";
 
 export default function BottomNav({ activeTab, setActiveTab, dueCount }) {
   const tabs = [
     { id: "dashboard", label: "หน้าแรก", icon: LayoutDashboard },
-    { id: "flashcard", label: "แฟลชการ์ด", icon: Layers, badge: dueCount },
+    { id: "boss", label: "สู้บอส", icon: Swords },
     { id: "movie", label: "ศัพท์หนัง", icon: Clapperboard },
     { id: "match", label: "เกมจับคู่", icon: Gamepad2 },
     { id: "grammar", label: "แกรมม่า", icon: BookOpenCheck },

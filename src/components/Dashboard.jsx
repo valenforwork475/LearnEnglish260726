@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen, BookOpenCheck, Gamepad2, Puzzle, Clapperboard } from "lucide-react";
+import { Play, Sparkles, Brain, Layers, SpellCheck, Zap, BookOpen, BookOpenCheck, Gamepad2, Puzzle, Clapperboard, Swords } from "lucide-react";
 import { LEVELS_CONFIG } from "../data/vocabulary";
 import LevelSelector from "./LevelSelector";
 
@@ -106,6 +106,25 @@ export default function Dashboard({ metrics, words, onStartSRS, onNavigate, sele
       <div>
         <h3 className="text-xs font-bold text-stone-500 mb-3 px-1">เลือกโหมดการฝึกจำ ({levelTitle})</h3>
         <div className="grid grid-cols-2 gap-3">
+          {/* Boss Battle Arena */}
+          <button
+            onClick={() => onNavigate("boss")}
+            className="p-5 rounded-3xl bg-gradient-to-br from-amber-600 via-rose-700 to-purple-950 border border-amber-400/50 hover:border-amber-300 text-left transition flex flex-col justify-between group shadow-lg col-span-2 relative overflow-hidden"
+          >
+            <div className="flex items-center justify-between w-full mb-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-400 text-stone-950 flex items-center justify-center font-bold shadow-md">
+                <Swords className="w-6 h-6 text-stone-950" />
+              </div>
+              <span className="px-3 py-1 text-[10px] font-black bg-amber-300 text-stone-950 rounded-full tracking-wider animate-pulse">
+                ⚔️ BOSS BATTLE MODE
+              </span>
+            </div>
+            <div>
+              <h4 className="font-black text-white text-lg group-hover:text-amber-200 transition">เกมสู้บอส: เอาตัวรอด & ถอดสำนวน</h4>
+              <p className="text-xs text-amber-100/90 mt-1 font-medium">ลุยด่านปราบบอสสนามบิน ร้านอาหาร และสำนวนเด็ด โจมตีบอสด้วยคำตอบที่ถูกต้อง!</p>
+            </div>
+          </button>
+
           {/* Movie Scene Vocab */}
           <button
             onClick={() => onNavigate("movie")}
