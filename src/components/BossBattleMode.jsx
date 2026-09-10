@@ -3,6 +3,7 @@ import { Swords, Heart, Flame, Shield, Trophy, ArrowLeft, RefreshCw, Volume2, Sp
 import confetti from "canvas-confetti";
 import { BOSS_STAGES } from "../data/bossBattles";
 import { speakText, sfx } from "../utils/audio";
+import Boss3DCanvas from "./Boss3DCanvas";
 
 export default function BossBattleMode({ accent, onBackToDashboard }) {
   const [selectedStage, setSelectedStage] = useState(BOSS_STAGES[0]);
@@ -262,7 +263,7 @@ export default function BossBattleMode({ accent, onBackToDashboard }) {
         <div className="text-xs font-extrabold text-amber-800">คะแนน: {score}</div>
       </div>
 
-      {/* Boss Health Bar Card */}
+      {/* Boss Health Bar Card with 3D Monster Canvas */}
       <div className={`rounded-3xl bg-gradient-to-br ${selectedStage.bgGradient} p-5 text-white shadow-xl space-y-3 border border-purple-500/30 relative overflow-hidden transition-all duration-300`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -279,6 +280,9 @@ export default function BossBattleMode({ accent, onBackToDashboard }) {
             </span>
           )}
         </div>
+
+        {/* 3D Animated Monster Avatar */}
+        <Boss3DCanvas stageId={selectedStage.id} isHit={isHit} hpPercent={bossHp / selectedStage.maxHp} />
 
         {/* HP Bar */}
         <div>
