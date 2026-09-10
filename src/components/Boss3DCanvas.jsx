@@ -9,251 +9,360 @@ export default function Boss3DCanvas({ stageId, isHit, hpPercent }) {
 
     const ctx = canvas.getContext("2d");
     let animationFrameId;
-    let angleX = 0;
-    let angleY = 0;
-    let angleZ = 0;
-    let bobAngle = 0;
+    let animTime = 0;
 
-    // Sparks particles on hit
-    let sparkParticles = [];
+    // Sparks & Stars Particles on Hit
+    let starParticles = [];
 
-    const createSparks = () => {
-      const pCount = 20;
-      for (let i = 0; i < pCount; i++) {
-        sparkParticles.push({
+    const createStarSparks = () => {
+      for (let i = 0; i < 25; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 3;
+        starParticles.push({
           x: canvas.width / 2,
-          y: canvas.height / 2,
-          vx: (Math.random() - 0.5) * 12,
-          vy: (Math.random() - 0.5) * 12,
+          y: canvas.height / 2 - 10,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
           life: 1.0,
+          size: Math.random() * 6 + 4,
           color: Math.random() > 0.5 ? "#f59e0b" : "#ef4444",
-          size: Math.random() * 4 + 2,
+          rot: Math.random() * Math.PI,
         });
       }
     };
 
     if (isHit) {
-      createSparks();
+      createStarSparks();
     }
 
-    // 3D Point Projection Helper
-    const project = (x, y, z, width, height) => {
-      const fov = 260;
-      const distance = 300;
-      const scale = fov / (distance + z);
-      const x2d = x * scale + width / 2;
-      const y2d = y * scale + height / 2;
-      return { x: x2d, y: y2d, scale };
+    // Helper: Draw 3D Shaded Sphere
+    const draw3DSphere = (x, y, radius, mainColor, highlightColor, shadowColor) => {
+      const grad = ctx.createRadialGradient(
+        x - radius * 0.3,
+        y - radius * 0.3,
+        radius * 0.1,
+        x,
+        y,
+        radius
+      );
+      grad.addColorStop(0, highlightColor);
+      grad.addColorStop(0.5, mainColor);
+      grad.addColorStop(1, shadowColor);
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
     };
 
-    // 3D Rotation Helper
-    const rotate3D = (point, rx, ry, rz) => {
-      let { x, y, z } = point;
+    // Helper: Draw Star Shape
+    const drawStar = (cx, cy, spikes, outerRadius, innerRadius, color) => {
+      let rot = (Math.PI / 2) * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
 
-      // Rotate X
-      let rad = rx;
-      let cos = Math.cos(rad);
-      let sin = Math.sin(rad);
-      let y1 = y * cos - z * sin;
-      let z1 = y * sin + z * cos;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
 
-      // Rotate Y
-      rad = ry;
-      cos = Math.cos(rad);
-      sin = Math.sin(rad);
-      let x2 = x * cos + z1 * sin;
-      let z2 = -x * sin + z1 * cos;
-
-      // Rotate Z
-      rad = rz;
-      cos = Math.cos(rad);
-      sin = Math.sin(rad);
-      let x3 = x2 * cos - y1 * sin;
-      let y3 = x2 * sin + y1 * cos;
-
-      return { x: x3, y: y3, z: z2 };
-    };
-
-    // 3D Models Data Generator
-    const getBossVertices = (type) => {
-      const vertices = [];
-      const edges = [];
-
-      if (type === "stage1") {
-        // Dragon Crystal Core (Octahedron + Ring)
-        const size = 50;
-        vertices.push(
-          { x: 0, y: -size * 1.3, z: 0 },
-          { x: size, y: 0, z: 0 },
-          { x: 0, y: 0, z: size },
-          { x: -size, y: 0, z: 0 },
-          { x: 0, y: 0, z: -size },
-          { x: 0, y: size * 1.3, z: 0 }
-        );
-        edges.push(
-          [0, 1], [0, 2], [0, 3], [0, 4],
-          [5, 1], [5, 2], [5, 3], [5, 4],
-          [1, 2], [2, 3], [3, 4], [4, 1]
-        );
-
-        // Orbiting Ring
-        const ringSegments = 12;
-        const ringRadius = 75;
-        const baseIndex = vertices.length;
-        for (let i = 0; i < ringSegments; i++) {
-          const theta = (i / ringSegments) * Math.PI * 2;
-          vertices.push({
-            x: Math.cos(theta) * ringRadius,
-            y: Math.sin(theta) * 15,
-            z: Math.sin(theta) * ringRadius,
-          });
-          edges.push([baseIndex + i, baseIndex + ((i + 1) % ringSegments)]);
-        }
-      } else if (type === "stage2") {
-        // Coffee Golem Cube Matrix
-        const s = 42;
-        vertices.push(
-          { x: -s, y: -s, z: -s }, { x: s, y: -s, z: -s },
-          { x: s, y: s, z: -s }, { x: -s, y: s, z: -s },
-          { x: -s, y: -s, z: s }, { x: s, y: -s, z: s },
-          { x: s, y: s, z: s }, { x: -s, y: s, z: s }
-        );
-        edges.push(
-          [0, 1], [1, 2], [2, 3], [3, 0],
-          [4, 5], [5, 6], [6, 7], [7, 4],
-          [0, 4], [1, 5], [2, 6], [3, 7]
-        );
-
-        // Outer Floating Cube Shell
-        const s2 = 65;
-        const baseIndex = vertices.length;
-        vertices.push(
-          { x: -s2, y: -s2, z: -s2 }, { x: s2, y: -s2, z: -s2 },
-          { x: s2, y: s2, z: -s2 }, { x: -s2, y: s2, z: -s2 },
-          { x: -s2, y: -s2, z: s2 }, { x: s2, y: -s2, z: s2 },
-          { x: s2, y: s2, z: s2 }, { x: -s2, y: s2, z: s2 }
-        );
-        edges.push(
-          [baseIndex + 0, baseIndex + 1], [baseIndex + 1, baseIndex + 2], [baseIndex + 2, baseIndex + 3], [baseIndex + 3, baseIndex + 0],
-          [baseIndex + 4, baseIndex + 5], [baseIndex + 5, baseIndex + 6], [baseIndex + 6, baseIndex + 7], [baseIndex + 7, baseIndex + 4],
-          [baseIndex + 0, baseIndex + 4], [baseIndex + 1, baseIndex + 5], [baseIndex + 2, baseIndex + 6], [baseIndex + 3, baseIndex + 7]
-        );
-      } else {
-        // Sphinx Icosahedron / Pyramid Matrix
-        const phi = (1 + Math.sqrt(5)) / 2;
-        const a = 32;
-        const b = a * phi;
-        vertices.push(
-          { x: -a, y: b, z: 0 }, { x: a, y: b, z: 0 }, { x: -a, y: -b, z: 0 }, { x: a, y: -b, z: 0 },
-          { x: 0, y: -a, z: b }, { x: 0, y: a, z: b }, { x: 0, y: -a, z: -b }, { x: 0, y: a, z: -b },
-          { x: b, y: 0, z: -a }, { x: b, y: 0, z: a }, { x: -b, y: 0, z: -a }, { x: -b, y: 0, z: a }
-        );
-        edges.push(
-          [0, 1], [0, 5], [0, 7], [0, 10], [0, 11],
-          [1, 5], [1, 7], [1, 8], [1, 9],
-          [2, 3], [2, 4], [2, 6], [2, 10], [2, 11],
-          [3, 4], [3, 6], [3, 8], [3, 9],
-          [4, 5], [4, 9], [4, 11], [5, 9], [5, 11],
-          [6, 7], [6, 8], [6, 10], [7, 8], [7, 10],
-          [8, 9], [10, 11]
-        );
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
       }
-
-      return { vertices, edges };
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
     };
 
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      animTime += 0.05;
+
       const width = canvas.width;
       const height = canvas.height;
+      const centerX = width / 2;
+      const centerY = height / 2 + Math.sin(animTime * 2) * 6; // Idle Bobbing
 
-      // Update angles
-      angleX += 0.012;
-      angleY += 0.018;
-      angleZ += 0.008;
-      bobAngle += 0.04;
+      // Squash & Stretch on Hit or Idle
+      let scaleX = 1.0;
+      let scaleY = 1.0;
+      if (isHit) {
+        scaleX = 1.25;
+        scaleY = 0.75;
+      } else {
+        scaleX = 1 + Math.sin(animTime * 4) * 0.03;
+        scaleY = 1 - Math.sin(animTime * 4) * 0.03;
+      }
 
-      const bobOffsetY = Math.sin(bobAngle) * 8;
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.scale(scaleX, scaleY);
 
-      const { vertices, edges } = getBossVertices(stageId || "stage1");
-
-      // Draw background glow
-      const glowGrad = ctx.createRadialGradient(
-        width / 2,
-        height / 2 + bobOffsetY,
-        10,
-        width / 2,
-        height / 2 + bobOffsetY,
-        110
-      );
-      
-      const mainColor = stageId === "stage1" ? "rgba(245, 158, 11, " : stageId === "stage2" ? "rgba(168, 85, 247, " : "rgba(6, 182, 212, ";
-      glowGrad.addColorStop(0, `${mainColor}${isHit ? 0.6 : 0.25})`);
-      glowGrad.addColorStop(1, `${mainColor}0)`);
-
-      ctx.fillStyle = glowGrad;
+      // Floor Shadow
+      ctx.save();
+      ctx.scale(1, 0.3);
+      const shadowGrad = ctx.createRadialGradient(0, 180, 5, 0, 180, 60);
+      shadowGrad.addColorStop(0, "rgba(0,0,0,0.4)");
+      shadowGrad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = shadowGrad;
       ctx.beginPath();
-      ctx.arc(width / 2, height / 2 + bobOffsetY, 120, 0, Math.PI * 2);
+      ctx.arc(0, 180, 60, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
 
-      // Project vertices
-      const projectedPoints = vertices.map((v) => {
-        const rot = rotate3D(v, angleX, angleY, angleZ);
-        rot.y += bobOffsetY;
-        if (isHit) {
-          rot.x += (Math.random() - 0.5) * 12;
-          rot.y += (Math.random() - 0.5) * 12;
-        }
-        return project(rot.x, rot.y, rot.z, width, height);
-      });
-
-      // Draw edges with 3D gradient stroke
-      ctx.lineWidth = isHit ? 3.5 : 2;
-      ctx.strokeStyle = isHit
-        ? "#ef4444"
-        : stageId === "stage1"
-        ? "#f59e0b"
-        : stageId === "stage2"
-        ? "#c084fc"
-        : "#22d3ee";
-
-      edges.forEach(([i, j]) => {
-        const p1 = projectedPoints[i];
-        const p2 = projectedPoints[j];
-        if (p1 && p2) {
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-      });
-
-      // Draw 3D vertex nodes
-      projectedPoints.forEach((p) => {
-        ctx.fillStyle = isHit ? "#ffffff" : "#fef08a";
+      // --- CUTE MONSTER 1: BABY DRAGON 🐲 ---
+      if (stageId === "stage1") {
+        // Little 3D Dragon Wings (Flapping)
+        const wingFlap = Math.sin(animTime * 6) * 0.3;
+        
+        // Left Wing
+        ctx.save();
+        ctx.translate(-35, -10);
+        ctx.rotate(-0.4 + wingFlap);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(1, 3 * p.scale), 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 22, 12, -0.2, 0, Math.PI * 2);
+        ctx.fillStyle = "#d97706";
         ctx.fill();
-      });
+        ctx.restore();
 
-      // Render 3D Sparks on Hit
-      sparkParticles.forEach((sp, idx) => {
+        // Right Wing
+        ctx.save();
+        ctx.translate(35, -10);
+        ctx.rotate(0.4 - wingFlap);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 22, 12, 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = "#d97706";
+        ctx.fill();
+        ctx.restore();
+
+        // Main Round Dragon Body (3D Golden Sphere)
+        draw3DSphere(0, 0, 48, "#f59e0b", "#fef08a", "#b45309");
+
+        // Cute Dragon Horns (3D Spikes)
+        draw3DSphere(-22, -42, 10, "#fbbf24", "#fffbeb", "#d97706");
+        draw3DSphere(22, -42, 10, "#fbbf24", "#fffbeb", "#d97706");
+
+        // Cute Belly Patch (3D Pale Yellow)
+        draw3DSphere(0, 15, 26, "#fef08a", "#ffffff", "#fde047");
+
+        // Big Cute Blinking 3D Eyes
+        const isBlinking = Math.sin(animTime * 0.8) > 0.95;
+        if (isHit) {
+          // Hurt >_< Eyes
+          ctx.strokeStyle = "#78350f";
+          ctx.lineWidth = 4;
+          ctx.lineCap = "round";
+          
+          // Left Eye >
+          ctx.beginPath();
+          ctx.moveTo(-22, -10); ctx.lineTo(-14, -5); ctx.lineTo(-22, 0);
+          ctx.stroke();
+
+          // Right Eye <
+          ctx.beginPath();
+          ctx.moveTo(22, -10); ctx.lineTo(14, -5); ctx.lineTo(22, 0);
+          ctx.stroke();
+        } else if (isBlinking) {
+          // Blinking eyes ^ ^
+          ctx.strokeStyle = "#78350f";
+          ctx.lineWidth = 3.5;
+          ctx.lineCap = "round";
+
+          ctx.beginPath();
+          ctx.arc(-16, -5, 8, Math.PI, 0);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(16, -5, 8, Math.PI, 0);
+          ctx.stroke();
+        } else {
+          // Big Cute Shiny Eyes
+          draw3DSphere(-16, -5, 11, "#1e1b4b", "#4338ca", "#0f172a");
+          draw3DSphere(16, -5, 11, "#1e1b4b", "#4338ca", "#0f172a");
+
+          // Pupil Highlights
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(-13, -8, 4, 0, Math.PI * 2);
+          ctx.arc(19, -8, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(-17, -2, 2, 0, Math.PI * 2);
+          ctx.arc(15, -2, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Rosy Cheeks
+        ctx.fillStyle = "rgba(244, 63, 94, 0.45)";
+        ctx.beginPath();
+        ctx.arc(-26, 8, 7, 0, Math.PI * 2);
+        ctx.arc(26, 8, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Mouth
+        ctx.strokeStyle = "#78350f";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 8, 6, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+      }
+
+      // --- CUTE MONSTER 2: COFFEE BEAR GOLEM 🐻☕ ---
+      else if (stageId === "stage2") {
+        // Cute Bear Ears
+        draw3DSphere(-34, -36, 16, "#78350f", "#b45309", "#451a03");
+        draw3DSphere(34, -36, 16, "#78350f", "#b45309", "#451a03");
+        draw3DSphere(-34, -36, 8, "#fde047", "#fef08a", "#ca8a04");
+        draw3DSphere(34, -36, 8, "#fde047", "#fef08a", "#ca8a04");
+
+        // Cute Waving Paw Hands
+        const pawWave = Math.sin(animTime * 5) * 8;
+        draw3DSphere(-46, 10 + pawWave, 12, "#92400e", "#d97706", "#451a03");
+        draw3DSphere(46, 10 - pawWave, 12, "#92400e", "#d97706", "#451a03");
+
+        // Main Round Bear Body
+        draw3DSphere(0, 0, 48, "#92400e", "#d97706", "#451a03");
+
+        // Coffee Cup Hat on Head ☕
+        ctx.save();
+        ctx.translate(0, -48);
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.roundRect(-16, -15, 32, 20, 6);
+        ctx.fill();
+        ctx.fillStyle = "#ca8a04";
+        ctx.fillRect(-14, -13, 28, 4);
+        ctx.restore();
+
+        // Snout (Cream 3D Oval)
+        draw3DSphere(0, 6, 18, "#fef3c7", "#ffffff", "#fde047");
+
+        // Little Cute Nose
+        draw3DSphere(0, 0, 6, "#451a03", "#78350f", "#000000");
+
+        // Cute Shiny Eyes
+        if (isHit) {
+          ctx.strokeStyle = "#451a03";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(-18, -12); ctx.lineTo(-10, -4);
+          ctx.moveTo(-10, -12); ctx.lineTo(-18, -4);
+          ctx.moveTo(10, -12); ctx.lineTo(18, -4);
+          ctx.moveTo(18, -12); ctx.lineTo(10, -4);
+          ctx.stroke();
+        } else {
+          draw3DSphere(-18, -8, 8, "#1e1b4b", "#4338ca", "#000000");
+          draw3DSphere(18, -8, 8, "#1e1b4b", "#4338ca", "#000000");
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(-16, -10, 3, 0, Math.PI * 2);
+          ctx.arc(20, -10, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Rosy Cheeks
+        ctx.fillStyle = "rgba(244, 63, 94, 0.4)";
+        ctx.beginPath();
+        ctx.arc(-26, 5, 6, 0, Math.PI * 2);
+        ctx.arc(26, 5, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // --- CUTE MONSTER 3: FOX SPHINX 🦊✨ ---
+      else {
+        // Fluffy Wagging Tail
+        const tailWag = Math.sin(animTime * 4) * 0.4;
+        ctx.save();
+        ctx.translate(28, 15);
+        ctx.rotate(0.5 + tailWag);
+        draw3DSphere(20, -10, 18, "#ea580c", "#fb923c", "#9a3412");
+        draw3DSphere(32, -18, 10, "#ffffff", "#ffffff", "#e2e8f0");
+        ctx.restore();
+
+        // Pointy Fox Ears
+        ctx.save();
+        ctx.fillStyle = "#ea580c";
+        ctx.beginPath();
+        ctx.moveTo(-38, -20); ctx.lineTo(-20, -52); ctx.lineTo(-10, -28);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fde047";
+        ctx.beginPath();
+        ctx.moveTo(-33, -22); ctx.lineTo(-20, -45); ctx.lineTo(-14, -28);
+        ctx.closePath(); ctx.fill();
+
+        ctx.fillStyle = "#ea580c";
+        ctx.beginPath();
+        ctx.moveTo(38, -20); ctx.lineTo(20, -52); ctx.lineTo(10, -28);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fde047";
+        ctx.beginPath();
+        ctx.moveTo(33, -22); ctx.lineTo(20, -45); ctx.lineTo(14, -28);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+
+        // Main Round Fox Body
+        draw3DSphere(0, 0, 46, "#ea580c", "#fb923c", "#9a3412");
+
+        // White Fluffy Chest / Muzzle
+        draw3DSphere(0, 12, 22, "#ffffff", "#ffffff", "#cbd5e1");
+
+        // Cute Black Nose
+        draw3DSphere(0, 2, 5, "#0f172a", "#334155", "#000000");
+
+        // Big Shiny Anime Eyes
+        if (isHit) {
+          ctx.strokeStyle = "#431407";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(-16, -8, 7, 0, Math.PI);
+          ctx.arc(16, -8, 7, 0, Math.PI);
+          ctx.stroke();
+        } else {
+          draw3DSphere(-16, -8, 10, "#0f172a", "#1e293b", "#000000");
+          draw3DSphere(16, -8, 10, "#0f172a", "#1e293b", "#000000");
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(-13, -11, 4, 0, Math.PI * 2);
+          ctx.arc(19, -11, 4, 0, Math.PI * 2);
+          ctx.arc(-18, -5, 2, 0, Math.PI * 2);
+          ctx.arc(14, -5, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Rosy Pink Cheeks
+        ctx.fillStyle = "rgba(244, 63, 94, 0.45)";
+        ctx.beginPath();
+        ctx.arc(-26, 4, 6, 0, Math.PI * 2);
+        ctx.arc(26, 4, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // Render Star Spark Particles on Hit
+      starParticles.forEach((sp) => {
         sp.x += sp.vx;
         sp.y += sp.vy;
-        sp.life -= 0.04;
+        sp.life -= 0.035;
 
         if (sp.life > 0) {
-          ctx.fillStyle = sp.color;
+          ctx.save();
           ctx.globalAlpha = sp.life;
-          ctx.beginPath();
-          ctx.arc(sp.x, sp.y, sp.size * sp.life, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1.0;
+          drawStar(sp.x, sp.y, 5, sp.size * sp.life, (sp.size / 2) * sp.life, sp.color);
+          ctx.restore();
         }
       });
 
-      sparkParticles = sparkParticles.filter((sp) => sp.life > 0);
+      starParticles = starParticles.filter((sp) => sp.life > 0);
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -271,7 +380,7 @@ export default function Boss3DCanvas({ stageId, isHit, hpPercent }) {
         ref={canvasRef}
         width={260}
         height={180}
-        className="w-full max-w-[260px] h-[180px] drop-shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-transform"
+        className="w-full max-w-[260px] h-[180px] drop-shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-transform"
       />
     </div>
   );
